@@ -227,6 +227,13 @@ module Grape
     end
 
     def response_body_parameter_object(parameters, content_type)
+      if parameters.size == 1
+        ref = parameters.first
+        if ref[:in] == 'body' && ref[:schema]['$ref']
+          return [content_type, { schema: ref[:schema] }]
+        end
+      end
+
       properties = parameters.map do |value|
         value[:schema][:type] = 'object' if value[:schema][:type] == 'json'
         if value[:schema][:type] == 'file'
